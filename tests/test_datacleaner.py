@@ -14,7 +14,6 @@ import unittest
 from datacleaner.datacleaner import (
     split_name,
     split_email,
-    convert_batch_frequency,
     clean_url,
     username_from_first_last_name,
     IPSplitter)
@@ -185,7 +184,6 @@ class SplitIPAddressRangeTests(unittest.TestCase):
 
     def setUp(self):
         self.printer = TestPrinter()
-        #self.printer.print_level = 1
         self.splitter = IPSplitter(self.printer)
 
     def split_ip(self, ip_str):
@@ -251,7 +249,7 @@ class SplitIPAddressRangeTests(unittest.TestCase):
         ip1 = '44.45.46.48'
         ip2 = '44.45.46.55'
         ip_str = ' - '.join((ip1, ip2)) + '.'
-        self.assertEqual([[ip1, ip2],], self.split_ip(ip_str))
+        self.assertEqual([[ip1, ip2]], self.split_ip(ip_str))
 
     def test_range_of_full_ip_address_and_single_octet(self):
         ip1 = '44.45.46.48'
@@ -272,11 +270,14 @@ class SplitIPAddressRangeTests(unittest.TestCase):
         ip1 = '44.45.46.128'
         ip2 = '44.45.46.191'
         ip_cidr = ip1 + '/26'
-        self.assertEqual([[ip1, ip2],], self.split_ip(ip_cidr))
+        self.assertEqual([[ip1, ip2]], self.split_ip(ip_cidr))
 
     def test_string_with_netmask(self):
         ip_str = 'ip: 193.168.182.192\nnetmask: 255.255.255.0\ngateway: 193.168.182.1'
-        self.assertEqual([['193.168.182.192', None],['193.168.182.1', None],], self.split_ip(ip_str))
+        self.assertEqual([
+            ['193.168.182.192', None],
+            ['193.168.182.1', None],
+        ], self.split_ip(ip_str))
 
     def test_local_addresses_excluded(self):
         ip_str = 'ip: 192.168.182.192\nanother: 10.11.12.13'
@@ -293,7 +294,6 @@ class SplitIPAddressRangeTests(unittest.TestCase):
         self.assertEqual([['44.45.46.0', '44.45.48.255']], self.split_ip(ip1))
 
     def test_real_data(self):
-        #self.printer.print_level = 3
         ip_data = "41.209.14.169/29, 41.209.14.170,41.209.14.172 and 41.209.14.173. "
         expected = [
             ['41.209.14.168', '41.209.14.175'],
